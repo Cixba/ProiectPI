@@ -353,6 +353,10 @@
                         }
                         ?>
                     </div>
+                    <?php
+                    if(isset($_COOKIE['token']))
+                    {
+                    ?>
                     <div class="review-add">
                         <h4>Adauga review</h4>
                         <form method="POST" class="ra-form">
@@ -367,6 +371,9 @@
                             </div>
                         </form>
                     </div>
+                    <?php
+                    }
+                    ?>
                 </div>
             </div>
         </div>
