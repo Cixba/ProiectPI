@@ -60,7 +60,6 @@
             <nav class="mainmenu mobile-menu">
                 <ul>
                     <li><a href="./index.php">Acasa</a></li>
-                    <li><a href="./about-us.html">Despre noi</a></li>
 
                     <?php 
                         if(!isset($_COOKIE['token']))
@@ -78,9 +77,7 @@
                         ?>
                         <li><a href="./dashboard.php">Cont</a></li>
                     <?php } else { ?>
-                        <li><a href="./index.php">
-                            <button style="background: none; border: none; cursor: pointer;padding: 0; margin: 0;" name="logout">Deautentificare</button>
-                        </a></li>
+                        <li><a href="./dashboard_user.php">Cont</a></li>
                     <?php } 
                         }
                     ?>
@@ -109,7 +106,6 @@
                                 <nav class="mainmenu">
                                     <ul>
                                         <li class="active"><a href="./index.html">Acasa</a></li>
-                                        <li><a href="./about-us.html">Despre noi</a></li>
 
                                         <?php 
                                             if(!isset($_COOKIE['token']))
@@ -127,9 +123,7 @@
                                             ?>
                                             <li><a href="./dashboard.php">Cont</a></li>
                                         <?php } else { ?>
-                                            <li><a href="./index.php">
-                                                <button style="background: none; border: none; cursor: pointer;padding: 0; margin: 0;" name="logout">Deautentificare</button>
-                                            </a></li>
+                                            <li><a href="./dashboard_user.php">Cont</a></li>
                                         <?php } 
                                             }
                                         ?>

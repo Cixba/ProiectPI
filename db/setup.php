@@ -1,7 +1,7 @@
 <?php
     require_once("connection.php");
 
-    $query_delete = "DROP TABLE IF EXISTS locatii, users";
+    $query_delete = "DROP TABLE IF EXISTS locatii, users, bookings, comments";
     $query_create = "
         CREATE TABLE users (
             id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -10,8 +10,6 @@
             token VARCHAR(50) NOT NULL,
             type VARCHAR(10) NOT NULL
         );
-
-        
     ";
 
     $query_insert = "
@@ -53,9 +51,30 @@
         ('Hotel Malibu', 115, 'Plaja Mamaia', 41, 'Room service, aer conditionat, plaja, parcare, wifi', 4, 1)
     ";
 
+    $query_bookings_create = "
+        CREATE TABLE bookings (
+            id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            client_id INT(10) UNSIGNED,
+            location_id INT(10) UNSIGNED,
+            start_date DATE,
+            end_date DATE
+        )
+    ";
+
+    $query_comments_create = "
+        CREATE TABLE comments (
+            id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(50),
+            parere VARCHAR(1000),
+            location_id INT(10) UNSIGNED
+        )
+    ";
+
     mysqli_query($conn, $query_delete);
     mysqli_query($conn, $query_create);
     mysqli_query($conn, $query_insert);
     mysqli_query($conn, $query_locatii_create);
     mysqli_query($conn, $query_locatii_insert);
+    mysqli_query($conn, $query_bookings_create);
+    mysqli_query($conn, $query_comments_create);
 ?>

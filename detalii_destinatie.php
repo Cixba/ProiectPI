@@ -29,6 +29,65 @@
         mysqli_query($conn, $query_sterge);
         header("Location: ./index.php");
     }
+
+    function check_if_available($start_date, $end_date)
+    {
+        global $conn;
+        $new_start_date = date('Y-m-d', strtotime($start_date));
+        $new_end_date = date('Y-m-d', strtotime($end_date));
+
+        $query = "select * from bookings where start_date between '$new_start_date' and '$new_end_date'";
+        $result = mysqli_query($conn, $query);
+
+        $row_booking = mysqli_fetch_assoc($result);
+
+        if($row_booking)
+            return 0;
+        else
+            return 1;
+    }
+
+    if(isset($_POST['verifica']))
+    {
+        $start_date = isset($_POST['start_date']) ? $_POST['start_date'] : '';
+        $end_date = isset($_POST['end_date']) ? $_POST['end_date'] : '';
+        $nr_persoane = isset($_POST['nr_persoane']) ? $_POST['nr_persoane'] : '';
+
+        $r = check_if_available($start_date, $end_date);
+
+        if($r == 0)
+            $_SESSION['is_available'] = 0;
+        else
+            $_SESSION['is_available'] = 1;
+    }
+
+    if(isset($_POST['rezerva']))
+    {
+        $start_date = isset($_POST['start_date']) ? $_POST['start_date'] : '';
+        $end_date = isset($_POST['end_date']) ? $_POST['end_date'] : '';
+        $nr_persoane = isset($_POST['nr_persoane']) ? $_POST['nr_persoane'] : '';
+
+        $new_start_date = date('Y-m-d', strtotime($start_date));
+        $new_end_date = date('Y-m-d', strtotime($end_date));
+
+        $r = check_if_available($start_date, $end_date);
+
+        $user_id = $row_user['id'];
+        if($r)
+        {
+            $query_insert_booking = "insert into bookings (client_id, location_id, start_date, end_date) values ($user_id, $id, '$new_start_date', '$new_end_date')";
+            mysqli_query($conn, $query_insert_booking);
+        }
+    }
+
+    if(isset($_POST['trimite_review']))
+    {
+        $name = isset($_POST['nume']) ? $_POST['nume'] : '';
+        $parere = isset($_POST['parere']) ? $_POST['parere'] : '';
+
+        $query_comments = "insert into comments (name, parere, location_id) values ('$name', '$parere', $id)";
+        mysqli_query($conn, $query_comments);
+    }
 ?>
 
 <!DOCTYPE html>
@@ -80,7 +139,6 @@
             <nav class="mainmenu mobile-menu">
                 <ul>
                     <li><a href="./index.php">Acasa</a></li>
-                    <li><a href="./about-us.html">Despre noi</a></li>
 
                     <?php 
                         if(!isset($_COOKIE['token']))
@@ -128,7 +186,6 @@
                                 <nav class="mainmenu">
                                     <ul>
                                         <li><a href="./index.php">Acasa</a></li>
-                                        <li><a href="./about-us.html">Despre noi</a></li>
 
                                         <?php 
                                             if(!isset($_COOKIE['token']))
@@ -216,30 +273,90 @@
                 </div>
                 <div class="col-lg-4">
                     <div class="room-booking">
-                        <form action="#">
+                        <form method="POST">
                             <div class="check-date">
                                 <label for="date-in">Check In:</label>
-                                <input type="text" class="date-input" id="date-in">
+                                <input type="text" class="date-input" id="date-in" name="start_date" required>
                                 <i class="icon_calendar"></i>
                             </div>
                             <div class="check-date">
                                 <label for="date-out">Check Out:</label>
-                                <input type="text" class="date-input" id="date-out">
+                                <input type="text" class="date-input" id="date-out" name="end_date" required>
                                 <i class="icon_calendar"></i>
                             </div>
                             <div class="select-option">
                                 <label for="guest">Numar persoane:</label>
-                                <select id="guest">
+                                <select id="guest" name="nr_persoane" required>
                                     <?php
                                     for($i = 1;$i <= $row['capacitate'];$i++)
                                     {
                                     ?>
-                                    <option value=""><?php echo $i;?></option>
+                                    <option value="<?php echo $i;?>"><?php echo $i;?></option>
                                     <?php } ?>
                                 </select>
                             </div>
 
-                            <button type="submit">Verifica disponibilitatea</button>
+                            <?php
+                                if(isset($_SESSION['is_available']))
+                                {
+                                    if($_SESSION['is_available'] == 1)
+                                    {
+                            ?>
+                                <button type="submit" name="rezerva" style="border-color: #55ab0f; color: #55ab0f">Rezerva acum</button>
+                                <div style="background-color: #82eb2d; padding: 1% 2%; margin-top: 2%;display: flex; align-items: center; justify-content: center;">
+                                    <p style="color: white; margin: 0;">Perioada selectata este libera</p>
+                                </div>
+                            <?php
+                                    } else {
+                            ?>
+                                <button type="submit" name="verifica">Verifica disponibilitatea</button>
+                                <div style="background-color: #ab120f; padding: 1% 2%; margin-top: 2%;display: flex; align-items: center; justify-content: center;">
+                                    <p style="color: white; margin: 0;">Perioada selectata nu este disponibila</p>
+                                </div>
+                            <?php
+                                    }
+                                }else{
+                            ?>
+                                <button type="submit" name="verifica">Verifica disponibilitatea</button>
+                            <?php
+                                }
+                            ?>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="rd-reviews">
+                        <h4>Pareri</h4>
+
+                        <?php
+                        $query_comentarii = "select * from comments where location_id=$id";
+                        $result = mysqli_query($conn, $query_comentarii);
+
+                        while($row = mysqli_fetch_assoc($result))
+                        {
+                        ?>
+                        <div class="review-item">
+                            <div class="ri-text">
+                                <h5><?php echo $row['name'];?></h5>
+                                <p style="white-space: pre-line;"><?php echo $row['parere'];?></p>
+                            </div>
+                        </div>
+                        <?php
+                        }
+                        ?>
+                    </div>
+                    <div class="review-add">
+                        <h4>Adauga review</h4>
+                        <form method="POST" class="ra-form">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <input type="text" placeholder="Nume*" name="nume" required>
+                                </div>
+                                <div class="col-lg-12">
+                                    <textarea placeholder="Spune-ne parerea ta*" name="parere" required></textarea>
+                                    <button type="submit" name="trimite_review">Trimite</button>
+                                </div>
+                            </div>
                         </form>
                     </div>
                 </div>

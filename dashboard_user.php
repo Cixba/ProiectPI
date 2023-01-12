@@ -11,7 +11,7 @@
 
         if(!$row['email'])
             header("Location: /PI/login.php");
-        if($row['type'] != 'admin')
+        if($row['type'] != 'user')
             header("Location: /PI/");
     } else
         header("Location: /PI/login.php");
@@ -408,14 +408,7 @@
                                 <li>
                                     <a href="./dashboard.php" class="mm-active">
                                         <i class="fa-solid fa-calendar-check" style="padding-right: 10px"></i>
-                                            Rezervari
-                                    </a>
-                                </li>
-
-                                <li>
-                                    <a href="./dashboard_locatie.php">
-                                        <i class="fa-solid fa-location-pin" style="padding-right: 10px"></i>
-                                            Adauga locatie
+                                            Rezervarile mele
                                     </a>
                                 </li>
 
@@ -437,50 +430,42 @@
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
-                                <th scope="col">Email</th>
                                 <th scope="col">Locatie</th>
                                 <th scope="col">Data inceput</th>
                                 <th scope="col">Data sfarsit</th>
+                                <th scope="col">Cost total</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
-                                $user_id = $row['id'];
-                                $query_get_locations = "select * from locatii where id_creator=$user_id";
-                                $result_locatii = mysqli_query($conn, $query_get_locations);
-
-                                $locations_ids = [];
-
-                                while($row = mysqli_fetch_assoc($result_locatii))
-                                {
-                                    $locations_ids[$row['id']] = $row['titlu'];
-                                }
+                                $uid = $row['id'];
+                                $query_bookings = "select * from bookings where client_id=$uid";
+                                $result = mysqli_query($conn, $query_bookings);
 
                                 $i = 1;
-                                foreach($locations_ids as $location_id => $location_name)
+                                while($row_bookings = mysqli_fetch_assoc($result))
                                 {
-                                    $query_get_bookings = "select * from bookings where location_id=$location_id";
-                                    $result = mysqli_query($conn, $query_get_bookings);
-
-                                    while($row = mysqli_fetch_assoc($result))
-                                    {
-                                        $uid = $row['client_id'];
-                                        $query_info_user = "select * from users where id=$uid";
-
-                                        $result_user = mysqli_query($conn, $query_info_user);
-                                        $row_user = mysqli_fetch_assoc($result_user);
-
-                            ?>
+                                    $lid = $row_bookings['location_id'];
+                                    $query_locatie = "select * from locatii where id=$lid";
+                                    $result_locatie = mysqli_query($conn, $query_locatie);
+                                    $row_locatie = mysqli_fetch_assoc($result_locatie);
+                            ?>  
                             <tr>
                                 <th scope="row"><?php echo $i;?></th>
-                                <td><?php echo $row_user['email'];?></td>
-                                <td><?php echo $location_name;?></td>
-                                <td><?php echo $row['start_date'];?></td>
-                                <td><?php echo $row['end_date'];?></td>
+                                <td><?php echo $row_locatie['titlu'];?></td>
+                                <td><?php echo $row_bookings['start_date'];?></td>
+                                <td><?php echo $row_bookings['end_date'];?></td>
+                                <?php
+                                $datetime1 = strtotime($row_bookings['start_date']);
+                                $datetime2 = strtotime($row_bookings['end_date']);
+                                
+                                $secs = $datetime2 - $datetime1;// == <seconds between the two times>
+                                $days = $secs / 86400;
+                                ?>
+                                <td><b><?php echo $days * $row_locatie['pret'];?></b>$</td>
                             </tr>
                             <?php
-                                        $i++;
-                                    }
+                                    $i++;
                                 }
                             ?>
                         </tbody>
