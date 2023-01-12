@@ -1,4 +1,6 @@
 <?php
+    ini_set('display_errors', 0);
+
     require_once("db/connection.php");
 
     if(isset($_COOKIE['token']))

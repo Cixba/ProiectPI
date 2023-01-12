@@ -1,4 +1,6 @@
 <?php
+    ini_set('display_errors', 0);
+    
     require_once("db/connection.php");
 
     if(!$_GET['id'])
@@ -18,10 +20,10 @@
         header("Location: index.php");
     }
 
-    $token = $_COOKIE['token'];
-    $query_user = "select * from users where token='$token'";
-    $result_user = mysqli_query($conn, $query_user);
-    $row_user = mysqli_fetch_assoc($result_user);
+    // $token = $_COOKIE['token'];
+    // $query_user = "select * from users where token='$token'";
+    // $result_user = mysqli_query($conn, $query_user);
+    // $row_user = mysqli_fetch_assoc($result_user);
 
     if(isset($_POST['sterge']))
     {
@@ -272,6 +274,9 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
+                    <?php if(isset($_COOKIE['token']))
+                    {
+                        ?>
                     <div class="room-booking">
                         <form method="POST">
                             <div class="check-date">
@@ -323,6 +328,9 @@
                             ?>
                         </form>
                     </div>
+                    <?php
+                    }
+                    ?>
                 </div>
 
                 <div class="rd-reviews">

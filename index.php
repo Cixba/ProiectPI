@@ -1,4 +1,6 @@
 <?php
+    ini_set('display_errors', 0);
+
     require_once("db/connection.php");
 
     if(isset($_POST['logout']))
@@ -8,8 +10,8 @@
         header("Location: index.php");
     }
 
-    if(!$_COOKIE['token'])
-        header("Location: ./login.php");
+    // if(!$_COOKIE['token'])
+    //     header("Location: ./login.php");
 ?>
 
 <!DOCTYPE html>
